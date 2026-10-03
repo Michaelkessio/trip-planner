@@ -97,9 +97,9 @@ Visit `http://localhost:3000`.
 3. Set `NEXTAUTH_URL` to your production URL, and add
    `https://your-domain.com/api/auth/callback/google` as an authorized redirect URI in Google Cloud
    Console.
-4. Vercel runs `npm install` → `postinstall` (`prisma generate`) → `next build` automatically. Run
-   `npx prisma migrate deploy` once against the production `DATABASE_URL` (e.g. via a one-off
-   Vercel deploy hook or locally pointed at prod) to apply the schema.
+4. Vercel runs `npm install` → `postinstall` (`prisma generate`) → `npm run build` automatically.
+   The build script now runs `prisma migrate deploy` before `next build`, so the database schema
+   is applied on every deploy - no manual migration step needed.
 
 ## Deploying (Render)
 
