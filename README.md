@@ -101,6 +101,30 @@ Visit `http://localhost:3000`.
    `npx prisma migrate deploy` once against the production `DATABASE_URL` (e.g. via a one-off
    Vercel deploy hook or locally pointed at prod) to apply the schema.
 
+## Deploying (Render)
+
+A `render.yaml` Blueprint is included, so this can deploy as a single Render web service.
+
+1. Push this repo to GitHub.
+2. In the Render dashboard: **New → Blueprint**, pick this repo. Render reads `render.yaml` and
+   provisions one web service (`ai-trip-planner`) with the build/start commands already set:
+   - Build: `npm install && npx prisma generate && npx prisma migrate deploy && npm run build`
+     (this also applies the Prisma schema to your database on every deploy)
+   - Start: `npm run start` (reads Render's `$PORT` automatically)
+3. Render will prompt for every env var marked `sync: false` in `render.yaml` — fill in the same
+   values as your local `.env` (Supabase/Neon `DATABASE_URL`, `NEXTAUTH_SECRET`, Google OAuth,
+   OpenAI, Google Maps, Amadeus).
+4. Set `NEXTAUTH_URL` to the `https://<your-service>.onrender.com` URL Render assigns (or your
+   custom domain), and add `https://<your-service>.onrender.com/api/auth/callback/google` as an
+   authorized redirect URI in Google Cloud Console.
+5. Deploy. Render auto-redeploys on every push to the branch you connect, same as Vercel.
+
+No Blueprint? You can set the same service up manually: **New → Web Service**, connect the repo,
+Node runtime, same build/start commands as above, add the env vars by hand.
+
+**Note:** Render's free web service tier spins down after inactivity and takes ~30–60s to wake on
+the next request — fine for testing, worth upgrading off of if you want it always-on.
+
 ## Where to extend next
 
 - Swap the Places `textsearch` calls for `nearbysearch` + category filters (e.g. museums, parks)
